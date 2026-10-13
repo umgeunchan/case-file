@@ -26,6 +26,7 @@ export const suspects: SuspectDef[] = [
       angry: 'suspects/haeun_angry.svg',
       final: 'suspects/haeun_final.svg',
     },
+    card: { bg: '#3a1c24', plate: '#7a2a36' },
   },
   {
     id: 'minseok',
@@ -40,6 +41,7 @@ export const suspects: SuspectDef[] = [
       angry: 'suspects/minseok_angry.svg',
       final: 'suspects/minseok_final.svg',
     },
+    card: { bg: '#2c3040', plate: '#3a4258' },
   },
   {
     id: 'doyun',
@@ -54,6 +56,7 @@ export const suspects: SuspectDef[] = [
       angry: 'suspects/doyun_angry.svg',
       final: 'suspects/doyun_final.svg',
     },
+    card: { bg: '#3a3430', plate: '#5e5850' },
   },
   {
     id: 'sera',
@@ -68,6 +71,7 @@ export const suspects: SuspectDef[] = [
       angry: 'suspects/sera_angry.svg',
       final: 'suspects/sera_final.svg',
     },
+    card: { bg: '#1c2444', plate: '#24346e' },
   },
 ];
 

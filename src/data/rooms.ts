@@ -16,6 +16,7 @@ export const rooms: Record<RoomId, RoomDef> = {
   study: {
     id: 'study',
     name: '서재',
+    intro: '펜트하우스 서재. 위스키 향이 희미하게 남아 있다.\n물건을 터치해 조사하자.',
     background: 'rooms/study.svg',
     colors: { base: '#3a2420', accent: '#6e2a35', text: '#f1e2d0' },
     theme: {
@@ -47,6 +48,7 @@ export const rooms: Record<RoomId, RoomDef> = {
   living: {
     id: 'living',
     name: '거실',
+    intro: '거실. 통창 너머로 서울의 밤이 펼쳐져 있다.\n물건을 터치해 조사하자.',
     background: 'rooms/living.svg',
     colors: { base: '#1c2541', accent: '#c9a227', text: '#f4ead2' },
     theme: {
@@ -73,6 +75,7 @@ export const rooms: Record<RoomId, RoomDef> = {
   kitchen: {
     id: 'kitchen',
     name: '주방',
+    intro: '주방. 펜던트 조명 아래 아일랜드 식탁.\n물건을 터치해 조사하자.',
     background: 'rooms/kitchen.svg',
     colors: { base: '#e9e6e1', accent: '#8a8178', text: '#2b2724' },
     theme: {

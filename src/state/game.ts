@@ -15,6 +15,8 @@ export type Panel = 'phone' | 'notebook' | 'interrogation' | 'accusation';
 export interface Notice {
   text: string;
   seq: number;
+  /** 대화창 위쪽에 보이는 제목 (조사한 물건 이름) */
+  title?: string;
 }
 
 export interface GameState {
@@ -87,8 +89,8 @@ export const initialState: GameState = {
 
 const addAll = (list: string[], add: string[]) => [...list, ...add.filter((id) => !list.includes(id))];
 
-function say(s: GameState, text: string): GameState {
-  return { ...s, dialog: { text, seq: s.seq + 1 }, seq: s.seq + 1 };
+function say(s: GameState, text: string, title?: string): GameState {
+  return { ...s, dialog: { text, title, seq: s.seq + 1 }, seq: s.seq + 1 };
 }
 
 function touch(s: GameState, hotspotId: string): GameState {
@@ -101,16 +103,16 @@ function touch(s: GameState, hotspotId: string): GameState {
     case 'item': {
       const item = items[action.item];
       if (item.evidence) return { ...next, items: addAll(next.items, [item.id]), overlay: item.id };
-      if (item.view === 'dialog') return say(next, item.text);
+      if (item.view === 'dialog') return say(next, item.text, item.name);
       return { ...next, overlay: item.id };
     }
     case 'give':
-      if (next.items.includes(action.item)) return say(next, action.emptyText);
-      return say({ ...next, items: [...next.items, action.item] }, action.text);
+      if (next.items.includes(action.item)) return say(next, action.emptyText, hotspot.label);
+      return say({ ...next, items: [...next.items, action.item] }, action.text, hotspot.label);
     case 'drawer':
-      if (next.drawerOpen) return say(next, drawerLock.emptyText);
-      if (!next.items.includes(drawerLock.requiresItem)) return say(next, drawerLock.lockedText);
-      return say({ ...next, drawerOpen: true, items: addAll(next.items, drawerLock.rewards) }, drawerLock.openText);
+      if (next.drawerOpen) return say(next, drawerLock.emptyText, hotspot.label);
+      if (!next.items.includes(drawerLock.requiresItem)) return say(next, drawerLock.lockedText, hotspot.label);
+      return say({ ...next, drawerOpen: true, items: addAll(next.items, drawerLock.rewards) }, drawerLock.openText, hotspot.label);
     case 'phone':
       return { ...next, panel: 'phone', phoneError: null };
   }

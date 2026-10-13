@@ -12,6 +12,8 @@ export type ItemView =
 export interface ItemDef {
   id: string;
   name: string;
+  /** 인벤토리 칸에 들어가는 짧은 이름 */
+  short?: string;
   text: string;
   /** true면 인벤토리에 들어가고 추리·심문·지목에 쓸 수 있다 */
   evidence: boolean;
@@ -81,6 +83,8 @@ export interface RoomTheme {
 export interface RoomDef {
   id: RoomId;
   name: string;
+  /** 방에 들어왔을 때 대화창에 보이는 문구 */
+  intro: string;
   /** src/assets 기준 경로. 없으면 colors로 단색 배경 */
   background?: string;
   colors: { base: string; accent: string; text: string };
@@ -97,6 +101,8 @@ export interface SuspectDef {
   motive: string | null;
   statement: string;
   sprites: Partial<Record<Expression, string>>;
+  /** 초상 카드 배경과 이름표 색 */
+  card: { bg: string; plate: string };
 }
 
 export interface Line {
