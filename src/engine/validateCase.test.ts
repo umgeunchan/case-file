@@ -14,7 +14,7 @@ describe('validateCase', () => {
   });
   it('객체가 아니거나 배열 필드가 없으면 오류', () => {
     expect(validateCase(null).length).toBeGreaterThan(0);
-    const c = clone() as Record<string, unknown>;
+    const c = clone() as unknown as Record<string, unknown>;
     delete c.items;
     expect(validateCase(c).join()).toContain('items');
   });
@@ -47,7 +47,7 @@ describe('validateCase', () => {
     expect(validateCase(c).join()).toContain('C1');
   });
   it('제한 시간과 난이도 범위', () => {
-    const c = clone() as Record<string, unknown>;
+    const c = clone() as unknown as Record<string, unknown>;
     c.timeLimitMinutes = 0;
     c.difficulty = 7;
     const errors = validateCase(c).join();
