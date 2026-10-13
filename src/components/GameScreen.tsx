@@ -3,6 +3,7 @@ import { useGame } from '../state/GameContext';
 import DialogBox from './DialogBox';
 import Inventory from './Inventory';
 import ItemPopup from './ItemPopup';
+import PhoneLock from './PhoneLock';
 import RoomView from './RoomView';
 
 export default function GameScreen({ debug }: { debug: boolean }) {
@@ -35,6 +36,7 @@ export default function GameScreen({ debug }: { debug: boolean }) {
         <Inventory />
       </div>
 
+      {state.panel === 'phone' && <PhoneLock />}
       <ItemPopup />
     </div>
   );

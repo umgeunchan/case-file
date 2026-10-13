@@ -64,3 +64,44 @@ describe('방과 핫스팟', () => {
     expect(run([{ type: 'VIEW_ITEM', item: 'earring' }], inGame).overlay).toBeNull();
   });
 });
+
+describe('서랍', () => {
+  it('열쇠가 없으면 잠겨 있다', () => {
+    const s = run([touch('drawer')], inGame);
+    expect(s.dialog?.text).toBe('잠겨 있다.');
+    expect(s.drawerOpen).toBe(false);
+  });
+  it('열쇠가 있으면 열리고 증거 3개를 얻는다', () => {
+    let s = run([{ type: 'GO_ROOM', room: 'kitchen' }, touch('sugar_jar'), { type: 'GO_ROOM', room: 'study' }, touch('drawer')], inGame);
+    expect(s.drawerOpen).toBe(true);
+    expect(s.items).toEqual(expect.arrayContaining(['appraisal', 'ledger', 'will_draft']));
+    s = run([touch('drawer')], s);
+    expect(s.dialog?.text).toBe('서랍은 이미 비어 있다.');
+    expect(s.items.filter((id) => id === 'appraisal')).toHaveLength(1);
+  });
+});
+
+describe('휴대폰', () => {
+  const atPhone = run([touch('phone')], inGame);
+  it('휴대폰을 터치하면 잠금 화면이 열린다', () => {
+    expect(atPhone.panel).toBe('phone');
+  });
+  it('하은의 생일을 넣으면 전용 힌트가 나오고 흔들리지 않는다', () => {
+    const s = run([{ type: 'SUBMIT_PIN', pin: '980315' }], atPhone);
+    expect(s.phoneUnlocked).toBe(false);
+    expect(s.phoneError?.text).toBe('비밀번호가 틀렸습니다. …같은 해, 다른 날일지도?');
+    expect(s.phoneError?.shake).toBe(false);
+  });
+  it('그 외 오답은 기본 메시지와 흔들림, 횟수 제한 없음', () => {
+    const s = run(Array.from({ length: 20 }, () => ({ type: 'SUBMIT_PIN', pin: '000000' }) as GameAction), atPhone);
+    expect(s.phoneError?.text).toBe('비밀번호가 틀렸습니다.');
+    expect(s.phoneError?.shake).toBe(true);
+    expect(run([{ type: 'SUBMIT_PIN', pin: '980417' }], s).phoneUnlocked).toBe(true);
+  });
+  it('정답이면 해제되고 문자·메모 증거 3개를 얻는다', () => {
+    const s = run([{ type: 'SUBMIT_PIN', pin: '980417' }], atPhone);
+    expect(s.phoneUnlocked).toBe(true);
+    expect(s.phoneError).toBeNull();
+    expect(s.items).toEqual(expect.arrayContaining(['msg_sera', 'msg_minseok', 'memo_forgery']));
+  });
+});

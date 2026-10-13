@@ -1,4 +1,5 @@
 import { items } from '../data/items';
+import { drawerLock, phoneLock } from '../data/locks';
 import { rooms } from '../data/rooms';
 import { scenario } from '../data/scenario';
 import type { RoomId } from '../data/types';
@@ -20,6 +21,10 @@ export interface GameState {
   items: string[];
   /** 한 번이라도 터치한 핫스팟 */
   checked: string[];
+  drawerOpen: boolean;
+  phoneUnlocked: boolean;
+  /** 휴대폰 오답 메시지. shake면 화면을 흔든다 */
+  phoneError: (Notice & { shake: boolean }) | null;
   panel: Panel | null;
   /** 팝업/확대 화면으로 보고 있는 아이템 */
   overlay: string | null;
@@ -37,7 +42,8 @@ export type GameAction =
   | { type: 'CLOSE_OVERLAY' }
   | { type: 'CLOSE_DIALOG' }
   | { type: 'OPEN_PANEL'; panel: Panel }
-  | { type: 'CLOSE_PANEL' };
+  | { type: 'CLOSE_PANEL' }
+  | { type: 'SUBMIT_PIN'; pin: string };
 
 export const initialState: GameState = {
   screen: 'title',
@@ -45,6 +51,9 @@ export const initialState: GameState = {
   room: 'study',
   items: [],
   checked: [],
+  drawerOpen: false,
+  phoneUnlocked: false,
+  phoneError: null,
   panel: null,
   overlay: null,
   dialog: null,
@@ -73,9 +82,23 @@ function touch(s: GameState, hotspotId: string): GameState {
     case 'give':
       if (next.items.includes(action.item)) return say(next, action.emptyText);
       return say({ ...next, items: [...next.items, action.item] }, action.text);
-    default:
-      return next;
+    case 'drawer':
+      if (next.drawerOpen) return say(next, drawerLock.emptyText);
+      if (!next.items.includes(drawerLock.requiresItem)) return say(next, drawerLock.lockedText);
+      return say({ ...next, drawerOpen: true, items: addAll(next.items, drawerLock.rewards) }, drawerLock.openText);
+    case 'phone':
+      return { ...next, panel: 'phone', phoneError: null };
   }
+}
+
+function submitPin(s: GameState, pin: string): GameState {
+  if (s.phoneUnlocked) return s;
+  if (pin === phoneLock.pin) {
+    return { ...s, phoneUnlocked: true, phoneError: null, items: addAll(s.items, phoneLock.rewards) };
+  }
+  const hint = phoneLock.hints.find((h) => h.input === pin);
+  const seq = s.seq + 1;
+  return { ...s, seq, phoneError: { text: hint ? hint.text : phoneLock.wrongText, shake: !hint, seq } };
 }
 
 export function gameReducer(s: GameState, a: GameAction): GameState {
@@ -101,5 +124,7 @@ export function gameReducer(s: GameState, a: GameAction): GameState {
       return { ...s, panel: a.panel, overlay: null };
     case 'CLOSE_PANEL':
       return { ...s, panel: null };
+    case 'SUBMIT_PIN':
+      return submitPin(s, a.pin);
   }
 }
