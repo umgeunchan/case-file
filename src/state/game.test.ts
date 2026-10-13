@@ -181,3 +181,59 @@ describe('심문', () => {
     expect(run([present('earring')], withAll).interrogation).toBeNull();
   });
 });
+
+describe('지목과 엔딩', () => {
+  const allEvidence = itemList.filter((i) => i.evidence).map((i) => i.id);
+  const ready: GameState = { ...inGame, items: allEvidence, phoneUnlocked: true };
+  const accuse = (suspect: 'haeun' | 'minseok' | 'doyun' | 'sera', evidence: string[]): GameAction => ({ type: 'ACCUSE', suspect, evidence });
+
+  it('휴대폰을 풀기 전에는 지목 화면을 열 수 없다', () => {
+    expect(run([{ type: 'OPEN_PANEL', panel: 'accusation' }], { ...ready, phoneUnlocked: false }).panel).toBeNull();
+    expect(run([{ type: 'OPEN_PANEL', panel: 'accusation' }], ready).panel).toBe('accusation');
+  });
+  it('정답이면 정답 엔딩', () => {
+    const s = run([{ type: 'OPEN_PANEL', panel: 'accusation' }, accuse('sera', ['earring', 'empty_vial', 'appraisal'])], ready);
+    expect(s.screen).toBe('ending');
+    expect(s.ending).toEqual({ kind: 'good' });
+  });
+  it('범주가 부족하면 게임 오버 없이 지목 화면에 남는다', () => {
+    const s = run([{ type: 'OPEN_PANEL', panel: 'accusation' }, accuse('sera', ['earring', 'group_photo', 'appraisal'])], ready);
+    expect(s.screen).toBe('game');
+    expect(s.panel).toBe('accusation');
+    expect(s.accuseNotice?.text).toBe('심증은 있지만 증거가 부족합니다.');
+  });
+  it('범인을 틀리면 오답 엔딩, 다시 추리하기로 지목 직전으로 돌아간다', () => {
+    let s = run([{ type: 'OPEN_PANEL', panel: 'accusation' }, accuse('doyun', ['earring', 'empty_vial', 'appraisal'])], ready);
+    expect(s.ending).toEqual({ kind: 'bad', suspect: 'doyun' });
+    s = run([{ type: 'RETRY_ACCUSATION' }], s);
+    expect(s.screen).toBe('game');
+    expect(s.panel).toBe('accusation');
+    expect(s.ending).toBeNull();
+    expect(s.items).toEqual(allEvidence);
+  });
+  it('갖고 있지 않은 증거로는 지목할 수 없다', () => {
+    const s = run([{ type: 'OPEN_PANEL', panel: 'accusation' }, accuse('sera', ['d_lie', 'd_method', 'd_motive'])], ready);
+    expect(s.screen).toBe('game');
+    expect(s.ending).toBeNull();
+  });
+});
+
+describe('처음부터 정답 엔딩까지', () => {
+  it('핫스팟 터치와 퍼즐만으로 정답 엔딩에 도달한다', () => {
+    const go = (room: 'study' | 'living' | 'kitchen'): GameAction => ({ type: 'GO_ROOM', room });
+    const s = run([
+      { type: 'NEW_GAME' },
+      ...scenario.intro.map(() => ({ type: 'NEXT_INTRO' }) as GameAction),
+      touch('earring'), touch('desk_calendar'),
+      go('living'), touch('group_photo'), touch('first_painting'), touch('empty_vial'), touch('torn_label'),
+      go('kitchen'), touch('sugar_jar'),
+      go('study'), touch('drawer'), touch('phone'), { type: 'SUBMIT_PIN', pin: '980417' }, { type: 'CLOSE_PANEL' },
+      { type: 'COMBINE', a: 'earring', b: 'group_photo' },
+      { type: 'COMBINE', a: 'empty_vial', b: 'torn_label' },
+      { type: 'COMBINE', a: 'appraisal', b: 'memo_forgery' },
+      { type: 'OPEN_PANEL', panel: 'accusation' },
+      { type: 'ACCUSE', suspect: 'sera', evidence: ['d_lie', 'd_method', 'd_motive'] },
+    ]);
+    expect(s.ending).toEqual({ kind: 'good' });
+  });
+});

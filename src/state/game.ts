@@ -1,10 +1,12 @@
 import { combineDuplicateText, combineFailText, deductionList } from '../data/deductions';
 import { dialogues, fallbackLine } from '../data/dialogues';
+import { insufficientText } from '../data/endings';
 import { items } from '../data/items';
 import { drawerLock, phoneLock } from '../data/locks';
 import { rooms } from '../data/rooms';
 import { scenario } from '../data/scenario';
 import type { Line, RoomId, SuspectId } from '../data/types';
+import { judge } from './judge';
 
 export type Screen = 'title' | 'intro' | 'game' | 'ending';
 export type Panel = 'phone' | 'notebook' | 'interrogation' | 'accusation';
@@ -33,6 +35,8 @@ export interface GameState {
   phoneUnlocked: boolean;
   /** 휴대폰 오답 메시지. shake면 화면을 흔든다 */
   phoneError: (Notice & { shake: boolean }) | null;
+  accuseNotice: Notice | null;
+  ending: { kind: 'good' } | { kind: 'bad'; suspect: SuspectId } | null;
   panel: Panel | null;
   /** 팝업/확대 화면으로 보고 있는 아이템 */
   overlay: string | null;
@@ -54,7 +58,10 @@ export type GameAction =
   | { type: 'SUBMIT_PIN'; pin: string }
   | { type: 'COMBINE'; a: string; b: string }
   | { type: 'SELECT_SUSPECT'; suspect: SuspectId }
-  | { type: 'PRESENT'; evidence: string };
+  | { type: 'PRESENT'; evidence: string }
+  | { type: 'ACCUSE'; suspect: SuspectId; evidence: string[] }
+  | { type: 'RETRY_ACCUSATION' }
+  | { type: 'TO_TITLE' };
 
 export const initialState: GameState = {
   screen: 'title',
@@ -69,6 +76,8 @@ export const initialState: GameState = {
   drawerOpen: false,
   phoneUnlocked: false,
   phoneError: null,
+  accuseNotice: null,
+  ending: null,
   panel: null,
   overlay: null,
   dialog: null,
@@ -157,6 +166,19 @@ function present(s: GameState, evidence: string): GameState {
   return speak({ ...s, presented }, suspect, line);
 }
 
+function accuse(s: GameState, suspect: SuspectId, evidence: string[]): GameState {
+  if (!s.phoneUnlocked) return s;
+  const usable = usableEvidence(s);
+  if (!evidence.every((id) => usable.includes(id))) return s;
+  const verdict = judge(suspect, evidence);
+  if (verdict === 'insufficient') {
+    const seq = s.seq + 1;
+    return { ...s, seq, accuseNotice: { text: insufficientText, seq } };
+  }
+  const ending = verdict === 'correct' ? ({ kind: 'good' } as const) : ({ kind: 'bad', suspect } as const);
+  return { ...s, screen: 'ending', panel: null, accuseNotice: null, ending };
+}
+
 export function gameReducer(s: GameState, a: GameAction): GameState {
   switch (a.type) {
     case 'NEW_GAME':
@@ -177,7 +199,8 @@ export function gameReducer(s: GameState, a: GameAction): GameState {
     case 'CLOSE_DIALOG':
       return { ...s, dialog: null };
     case 'OPEN_PANEL':
-      return { ...s, panel: a.panel, overlay: null };
+      if (a.panel === 'accusation' && !s.phoneUnlocked) return s;
+      return { ...s, panel: a.panel, overlay: null, accuseNotice: null };
     case 'CLOSE_PANEL':
       return { ...s, panel: null };
     case 'SUBMIT_PIN':
@@ -188,5 +211,11 @@ export function gameReducer(s: GameState, a: GameAction): GameState {
       return speak(s, a.suspect, dialogues[a.suspect].base);
     case 'PRESENT':
       return present(s, a.evidence);
+    case 'ACCUSE':
+      return accuse(s, a.suspect, a.evidence);
+    case 'RETRY_ACCUSATION':
+      return { ...s, screen: 'game', panel: 'accusation', ending: null };
+    case 'TO_TITLE':
+      return { ...s, screen: 'title', panel: null, overlay: null };
   }
 }

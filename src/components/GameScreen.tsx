@@ -1,5 +1,6 @@
 import { roomOrder, rooms } from '../data/rooms';
 import { useGame } from '../state/GameContext';
+import Accusation from './Accusation';
 import DialogBox from './DialogBox';
 import Interrogation from './Interrogation';
 import Inventory from './Inventory';
@@ -41,12 +42,21 @@ export default function GameScreen({ debug }: { debug: boolean }) {
             추리 노트{state.deductions.length > 0 && ` (${state.deductions.length})`}
           </button>
           <button className="pbtn" onClick={() => dispatch({ type: 'OPEN_PANEL', panel: 'interrogation' })}>심문</button>
+          <button
+            className="pbtn pbtn-primary"
+            disabled={!state.phoneUnlocked}
+            title={state.phoneUnlocked ? undefined : '피해자의 휴대폰을 먼저 조사하자'}
+            onClick={() => dispatch({ type: 'OPEN_PANEL', panel: 'accusation' })}
+          >
+            지목
+          </button>
         </div>
       </div>
 
       {state.panel === 'phone' && <PhoneLock />}
       {state.panel === 'notebook' && <Notebook />}
       {state.panel === 'interrogation' && <Interrogation />}
+      {state.panel === 'accusation' && <Accusation />}
       <ItemPopup />
     </div>
   );

@@ -1,3 +1,4 @@
+import EndingScreen from './components/EndingScreen';
 import GameScreen from './components/GameScreen';
 import IntroScreen from './components/IntroScreen';
 import TitleScreen from './components/TitleScreen';
@@ -12,6 +13,8 @@ function Screens() {
       return <TitleScreen />;
     case 'intro':
       return <IntroScreen />;
+    case 'ending':
+      return <EndingScreen />;
     default:
       return <GameScreen debug={debug} />;
   }
