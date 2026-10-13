@@ -1,0 +1,137 @@
+/* 폰트는 여기서만 바꾸면 된다 (픽셀 폰트로 교체 시 --font-ui, --font-dialog 수정) */
+:root {
+  --font-ui: 'Noto Sans KR', system-ui, sans-serif;
+  --font-dialog: 'Noto Sans KR', system-ui, sans-serif;
+  --font-title: 'Special Elite', 'Noto Sans KR', serif;
+
+  --bg: #0d0b0a;
+  --panel: #191513;
+  --panel-2: #241e1b;
+  --paper: #efe6d2;
+  --ink: #2a221c;
+  --text: #f1e8da;
+  --muted: #a89b8a;
+  --line: #3d342d;
+  --accent: #c0392b;
+  --gold: #d4a84a;
+  --ok: #6fbf73;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: #050404; color: var(--text); font-family: var(--font-ui); -webkit-tap-highlight-color: transparent; }
+#root { height: 100%; }
+img { image-rendering: pixelated; max-width: 100%; display: block; }
+button { font: inherit; color: inherit; }
+
+/* 세로 390×844 기준 프레임. 넓은 화면에서는 가운데 정렬 */
+.frame {
+  position: relative; width: 100%; max-width: 430px; height: 100dvh; margin: 0 auto;
+  background: var(--bg); overflow: hidden; display: flex; flex-direction: column;
+}
+
+.pbtn {
+  min-height: 44px; padding: 0 18px; border-radius: var(--radius); cursor: pointer;
+  border: 2px solid var(--line); background: var(--panel-2); font-weight: 700;
+}
+.pbtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pbtn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.link-btn { background: none; border: none; color: var(--muted); cursor: pointer; padding: 8px; text-decoration: underline; }
+
+/* 타이틀 */
+.title-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center;
+  background: radial-gradient(circle at 50% 35%, #3a2420 0%, var(--bg) 70%); }
+.title-eyebrow { margin: 0; color: var(--gold); font-family: var(--font-title); letter-spacing: 0.2em; }
+.title-name { margin: 0 0 24px; font-family: var(--font-title); font-size: 2rem; line-height: 1.3; }
+.title-actions { display: flex; flex-direction: column; gap: 10px; width: min(240px, 100%); }
+
+/* 인트로 */
+.intro-screen { flex: 1; display: flex; flex-direction: column; padding: 16px; gap: 12px; }
+.intro-head { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 0.85rem; }
+.intro-art { flex: 1; display: grid; place-items: center; border: 2px solid var(--line); border-radius: var(--radius);
+  background: repeating-linear-gradient(45deg, #1a1412 0 12px, #1f1816 12px 24px); font-family: var(--font-title); color: var(--muted); }
+
+/* 대화창 */
+.dialog-box {
+  position: relative; display: block; width: 100%; min-height: 96px; padding: 12px 14px 22px; text-align: left; cursor: pointer;
+  background: var(--paper); color: var(--ink); border: 3px solid #1a1411; border-radius: var(--radius);
+  box-shadow: inset 0 0 0 2px #c9b996; font-family: var(--font-dialog); line-height: 1.55;
+}
+.dialog-speaker { display: inline-block; margin-bottom: 4px; padding: 0 8px; background: var(--ink); color: var(--paper); font-size: 0.8rem; font-weight: 700; border-radius: 4px; }
+.dialog-text { display: block; white-space: pre-wrap; }
+.dialog-rest { visibility: hidden; }
+.dialog-next { position: absolute; right: 12px; bottom: 4px; font-size: 0.8rem; animation: blink 0.9s steps(2) infinite; }
+.dialog-intro { min-height: 140px; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* 게임 화면 */
+.game-screen { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.room-tabs { display: flex; gap: 4px; padding: 8px 8px 0; }
+.room-tab { flex: 1; min-height: 40px; border: 2px solid var(--line); border-bottom: none; border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--panel); color: var(--muted); cursor: pointer; font-weight: 700; }
+.room-tab.is-active { background: var(--panel-2); color: var(--text); border-color: var(--gold); }
+
+.stage-wrap { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; container-type: size; background: #000; }
+.stage {
+  position: relative; aspect-ratio: 3 / 4; width: min(100cqw, calc(100cqh * 3 / 4)); overflow: hidden;
+  background: linear-gradient(170deg, var(--room-accent) 0%, var(--room-base) 55%); color: var(--room-text);
+}
+.stage-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+.stage-watermark { position: absolute; inset: auto 0 6% 0; text-align: center; font-family: var(--font-title); font-size: 2.4rem; opacity: 0.12; pointer-events: none; }
+
+.hotspot {
+  position: absolute; padding: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  border: 2px dashed color-mix(in srgb, var(--room-text) 45%, transparent); border-radius: 6px;
+  background: color-mix(in srgb, var(--room-text) 8%, transparent); color: var(--room-text);
+}
+.hotspot:active { background: color-mix(in srgb, var(--room-text) 22%, transparent); }
+.hotspot-label { font-size: 0.72rem; font-weight: 700; line-height: 1.2; text-align: center; word-break: keep-all; }
+.hotspot-check {
+  position: absolute; top: -7px; right: -7px; width: 18px; height: 18px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 0.65rem; background: var(--ok); color: #fff;
+}
+/* 실제 배경 에셋이 있으면 핫스팟은 투명하게 */
+.stage.has-art .hotspot { border-color: transparent; background: transparent; }
+.stage.has-art .hotspot-label { display: none; }
+/* 디버그 모드: 핫스팟 영역을 반투명 박스로 */
+.stage.is-debug .hotspot { border: 1px solid #ff3b6b; background: rgba(255, 59, 107, 0.28); }
+.stage.is-debug .hotspot-label { display: block; color: #fff; font-family: monospace; font-size: 0.6rem; }
+
+.hud { display: flex; flex-direction: column; gap: 6px; padding: 8px; background: var(--panel); border-top: 2px solid var(--line); }
+
+/* 인벤토리 */
+.inventory { display: flex; gap: 6px; overflow-x: auto; min-height: 58px; align-items: center; padding-bottom: 2px; }
+.inventory-empty { color: var(--muted); font-size: 0.85rem; padding: 0 4px; }
+.inv-slot {
+  flex: 0 0 auto; width: 56px; height: 56px; padding: 4px; border-radius: 6px; cursor: pointer;
+  border: 2px solid var(--line); background: var(--panel-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+}
+.inv-slot.is-key { border-color: var(--gold); }
+.inv-name { font-size: 0.55rem; line-height: 1.1; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.item-icon { width: 28px; height: 28px; }
+.item-icon.is-placeholder { display: grid; place-items: center; border-radius: 4px; background: var(--paper); color: var(--ink); font-weight: 700; }
+
+/* 오버레이와 팝업 */
+.overlay { position: absolute; inset: 0; z-index: 30; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, 0.72); }
+.popup { width: 100%; max-width: 360px; max-height: 100%; overflow-y: auto; padding: 18px; border-radius: var(--radius);
+  background: var(--panel); border: 2px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.popup-art { width: 120px; height: 120px; display: grid; place-items: center; background: var(--panel-2); border-radius: 6px; }
+.popup-art .item-icon { width: 64px; height: 64px; font-size: 2rem; }
+.popup-art img { width: 100%; height: 100%; object-fit: contain; }
+.popup-name { margin: 0; font-size: 1.15rem; }
+.popup-tag { font-size: 0.75rem; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--gold); color: var(--gold); }
+.popup-tag.is-key { border-color: var(--ok); color: var(--ok); }
+.popup-text { margin: 0; line-height: 1.6; }
+.popup-close { width: 100%; margin-top: 6px; }
+.popup-zoom { background: var(--paper); color: var(--ink); border-color: #1a1411; }
+.zoom-lines { list-style: none; padding: 12px; margin: 0; width: 100%; text-align: left; font-family: monospace; font-size: 1rem; line-height: 1.9;
+  background: #fffaf0; border: 1px dashed #b9a982; border-radius: 4px; }
+
+.flip { width: 100%; display: flex; flex-direction: column; gap: 10px; perspective: 800px; }
+.flip-inner { position: relative; height: 180px; transition: transform 0.6s; transform-style: preserve-3d; }
+.flip-inner.is-flipped { transform: rotateY(180deg); }
+.flip-face { position: absolute; inset: 0; display: grid; place-items: center; padding: 16px; border-radius: 6px; backface-visibility: hidden; line-height: 1.6; }
+.flip-front { background: linear-gradient(135deg, #6b8f5e, #c9a24a); color: #1b1610; font-weight: 700; }
+.flip-back { background: #b89a6b; color: #2a1f12; transform: rotateY(180deg); font-family: var(--font-dialog); }
+@media (prefers-reduced-motion: reduce) { .flip-inner { transition: none; } }
