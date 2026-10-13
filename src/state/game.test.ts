@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { deductionList } from '../data/deductions';
+import { itemList } from '../data/items';
 import { scenario } from '../data/scenario';
 import { gameReducer, initialState, type GameAction, type GameState } from './game';
 
@@ -103,5 +105,39 @@ describe('휴대폰', () => {
     expect(s.phoneUnlocked).toBe(true);
     expect(s.phoneError).toBeNull();
     expect(s.items).toEqual(expect.arrayContaining(['msg_sera', 'msg_minseok', 'memo_forgery']));
+  });
+});
+
+describe('추리 노트', () => {
+  const allEvidence = itemList.filter((i) => i.evidence).map((i) => i.id);
+  const withAll: GameState = { ...inGame, items: allEvidence };
+  const combine = (a: string, b: string): GameAction => ({ type: 'COMBINE', a, b });
+
+  it.each(deductionList.map((d) => [d.id, d] as const))('%s 조합이 동작한다 (순서 무관)', (_id, d) => {
+    // 추리 결과를 재료로 쓰는 조합은 그 결과를 먼저 만들어 둔다
+    const prereq = deductionList.filter((x) => d.inputs.includes(x.id)).map((x) => combine(...x.inputs));
+    const forward = run([...prereq, combine(d.inputs[0], d.inputs[1])], withAll);
+    const reverse = run([...prereq, combine(d.inputs[1], d.inputs[0])], withAll);
+    for (const s of [forward, reverse]) {
+      expect(s.deductions).toContain(d.id);
+      expect(s.notebookResult).toMatchObject({ success: true, text: d.text });
+    }
+  });
+  it('연결점이 없는 조합은 실패 문구', () => {
+    const s = run([combine('police_memo', 'ledger')], withAll);
+    expect(s.deductions).toEqual([]);
+    expect(s.notebookResult).toMatchObject({ success: false, text: '이 둘 사이에는 연결점이 보이지 않는다.' });
+  });
+  it('이미 만든 추리는 다시 기록하지 않는다', () => {
+    const s = run([combine('smartwatch', 'doorlock_log'), combine('doorlock_log', 'smartwatch')], withAll);
+    expect(s.deductions).toEqual(['d_time']);
+    expect(s.notebookResult?.text).toBe('이미 노트에 적어 둔 추리다.');
+  });
+  it('갖고 있지 않은 증거로는 조합할 수 없다', () => {
+    expect(run([combine('smartwatch', 'doorlock_log')], inGame).deductions).toEqual([]);
+    expect(run([combine('msg_sera', 'd_time')], withAll).deductions).toEqual([]);
+  });
+  it('같은 증거 두 개는 조합할 수 없다', () => {
+    expect(run([combine('smartwatch', 'smartwatch')], withAll).notebookResult?.success).toBe(false);
   });
 });

@@ -3,6 +3,7 @@ import { useGame } from '../state/GameContext';
 import DialogBox from './DialogBox';
 import Inventory from './Inventory';
 import ItemPopup from './ItemPopup';
+import Notebook from './Notebook';
 import PhoneLock from './PhoneLock';
 import RoomView from './RoomView';
 
@@ -34,9 +35,15 @@ export default function GameScreen({ debug }: { debug: boolean }) {
           onAdvance={state.dialog ? () => dispatch({ type: 'CLOSE_DIALOG' }) : undefined}
         />
         <Inventory />
+        <div className="actions-bar">
+          <button className="pbtn" onClick={() => dispatch({ type: 'OPEN_PANEL', panel: 'notebook' })}>
+            추리 노트{state.deductions.length > 0 && ` (${state.deductions.length})`}
+          </button>
+        </div>
       </div>
 
       {state.panel === 'phone' && <PhoneLock />}
+      {state.panel === 'notebook' && <Notebook />}
       <ItemPopup />
     </div>
   );

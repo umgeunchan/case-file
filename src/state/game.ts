@@ -1,3 +1,4 @@
+import { combineDuplicateText, combineFailText, deductionList } from '../data/deductions';
 import { items } from '../data/items';
 import { drawerLock, phoneLock } from '../data/locks';
 import { rooms } from '../data/rooms';
@@ -21,6 +22,9 @@ export interface GameState {
   items: string[];
   /** 한 번이라도 터치한 핫스팟 */
   checked: string[];
+  /** 추리 노트에 기록된 추리 결과 */
+  deductions: string[];
+  notebookResult: (Notice & { success: boolean }) | null;
   drawerOpen: boolean;
   phoneUnlocked: boolean;
   /** 휴대폰 오답 메시지. shake면 화면을 흔든다 */
@@ -43,7 +47,8 @@ export type GameAction =
   | { type: 'CLOSE_DIALOG' }
   | { type: 'OPEN_PANEL'; panel: Panel }
   | { type: 'CLOSE_PANEL' }
-  | { type: 'SUBMIT_PIN'; pin: string };
+  | { type: 'SUBMIT_PIN'; pin: string }
+  | { type: 'COMBINE'; a: string; b: string };
 
 export const initialState: GameState = {
   screen: 'title',
@@ -51,6 +56,8 @@ export const initialState: GameState = {
   room: 'study',
   items: [],
   checked: [],
+  deductions: [],
+  notebookResult: null,
   drawerOpen: false,
   phoneUnlocked: false,
   phoneError: null,
@@ -101,6 +108,25 @@ function submitPin(s: GameState, pin: string): GameState {
   return { ...s, seq, phoneError: { text: hint ? hint.text : phoneLock.wrongText, shake: !hint, seq } };
 }
 
+/** 추리·심문·지목에 쓸 수 있는 것: 획득한 증거 + 기록된 추리 결과 */
+export function usableEvidence(s: GameState): string[] {
+  return [...s.items.filter((id) => items[id]?.evidence), ...s.deductions];
+}
+
+function combine(s: GameState, a: string, b: string): GameState {
+  const usable = usableEvidence(s);
+  if (a === b || !usable.includes(a) || !usable.includes(b)) return note(s, combineFailText, false);
+  const found = deductionList.find((d) => d.inputs.includes(a) && d.inputs.includes(b));
+  if (!found) return note(s, combineFailText, false);
+  if (s.deductions.includes(found.id)) return note(s, combineDuplicateText, false);
+  return note({ ...s, deductions: [...s.deductions, found.id] }, found.text, true);
+}
+
+function note(s: GameState, text: string, success: boolean): GameState {
+  const seq = s.seq + 1;
+  return { ...s, seq, notebookResult: { text, success, seq } };
+}
+
 export function gameReducer(s: GameState, a: GameAction): GameState {
   switch (a.type) {
     case 'NEW_GAME':
@@ -126,5 +152,7 @@ export function gameReducer(s: GameState, a: GameAction): GameState {
       return { ...s, panel: null };
     case 'SUBMIT_PIN':
       return submitPin(s, a.pin);
+    case 'COMBINE':
+      return combine(s, a.a, a.b);
   }
 }
