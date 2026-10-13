@@ -55,8 +55,23 @@ describe('storage', () => {
     expect(() => saveProgress(newProgress('mini', 0), throwing)).not.toThrow();
     expect(() => clearProgress('mini', throwing)).not.toThrow();
   });
-  it('저장소가 없어도(Node 환경) 예외를 던지지 않는다', () => {
-    expect(loadProgress('mini')).toBeNull();
-    expect(() => saveProgress(newProgress('mini', 0))).not.toThrow();
+  it('저장소 접근이 막히면 메모리에 보관해 같은 세션에서 이어진다', () => {
+    const p = newProgress('blocked', 7);
+    saveProgress(p, throwing);
+    expect(loadProgress('blocked', throwing)).toEqual(p);
+    clearProgress('blocked', throwing);
+    expect(loadProgress('blocked', throwing)).toBeNull();
+  });
+  it('쓰기만 실패하는 저장소(용량 초과)에서도 메모리로 이어진다', () => {
+    const store = { ...memoryStore(), setItem: () => { throw new Error('quota'); } };
+    const p = newProgress('quota', 9);
+    saveProgress(p, store);
+    expect(loadProgress('quota', store)).toEqual(p);
+  });
+  it('저장소가 없는(Node) 환경에서도 메모리로 이어진다', () => {
+    expect(loadProgress('nostore')).toBeNull();
+    const p = newProgress('nostore', 3);
+    saveProgress(p);
+    expect(loadProgress('nostore')).toEqual(p);
   });
 });
