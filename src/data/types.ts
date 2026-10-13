@@ -41,12 +41,50 @@ export interface Hotspot {
   action: HotspotAction;
 }
 
+/** 방마다 바뀌는 UI 색 (디자인의 방별 팔레트). CSS 변수 --t-<키>로 들어간다 */
+export interface RoomTheme {
+  bg: string;
+  navBg: string;
+  navBorder: string;
+  tabBg: string;
+  tabText: string;
+  tabNum: string;
+  tabBorder: string;
+  tabActiveBg: string;
+  tabActiveText: string;
+  tabActiveNum: string;
+  tabActiveBorder: string;
+  dialogBg: string;
+  dialogFrame: string;
+  dialogInset: string;
+  dialogText: string;
+  dialogTitle: string;
+  speakerBg: string;
+  speakerText: string;
+  speakerBorder: string;
+  hudBg: string;
+  hudBorder: string;
+  hudLabel: string;
+  hudAccent: string;
+  buttonBg: string;
+  buttonText: string;
+  slotBg: string;
+  slotBorder: string;
+  slotText: string;
+  slotEmpty: string;
+  badgeBg: string;
+  badgeText: string;
+  badgeAccent: string;
+  select: string;
+}
+
 export interface RoomDef {
   id: RoomId;
   name: string;
   /** src/assets 기준 경로. 없으면 colors로 단색 배경 */
   background?: string;
   colors: { base: string; accent: string; text: string };
+  theme: RoomTheme;
   hotspots: Hotspot[];
 }
 

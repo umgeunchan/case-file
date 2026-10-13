@@ -9,7 +9,7 @@ export const scenario = {
     'IT 투자자이자 미술품 컬렉터. 사인은 위스키 잔에 섞인 약물.',
     '그날 밤 이 집에 있던 사람은 네 명. 서재, 거실, 주방을 조사해 범인을 밝혀내라.',
   ],
-  victim: { name: '서진우', age: 58, description: 'IT 투자자 겸 미술품 컬렉터' },
+  victim: { name: '서진우', age: 58, description: 'IT 투자자 겸 미술품 컬렉터', image: 'suspects/victim.svg' },
 };
 
 export const suspects: SuspectDef[] = [
@@ -20,7 +20,12 @@ export const suspects: SuspectDef[] = [
     relation: '딸',
     motive: '유언장에서 빠질 위기',
     statement: '10시 반에 아빠랑 다투고 바로 집에 갔어요.',
-    sprites: {},
+    sprites: {
+      normal: 'suspects/haeun_normal.svg',
+      sweat: 'suspects/haeun_sweat.svg',
+      angry: 'suspects/haeun_angry.svg',
+      final: 'suspects/haeun_final.svg',
+    },
   },
   {
     id: 'minseok',
@@ -29,7 +34,12 @@ export const suspects: SuspectDef[] = [
     relation: '비서',
     motive: '횡령',
     statement: '사장님이 두통약을 부탁해서 편의점에 다녀왔어요.',
-    sprites: {},
+    sprites: {
+      normal: 'suspects/minseok_normal.svg',
+      sweat: 'suspects/minseok_sweat.svg',
+      angry: 'suspects/minseok_angry.svg',
+      final: 'suspects/minseok_final.svg',
+    },
   },
   {
     id: 'doyun',
@@ -38,7 +48,12 @@ export const suspects: SuspectDef[] = [
     relation: '전속 요리사',
     motive: '해고 통보',
     statement: '11시부터 주방에서 야식을 만들었소.',
-    sprites: {},
+    sprites: {
+      normal: 'suspects/doyun_normal.svg',
+      sweat: 'suspects/doyun_sweat.svg',
+      angry: 'suspects/doyun_angry.svg',
+      final: 'suspects/doyun_final.svg',
+    },
   },
   {
     id: 'sera',
@@ -47,7 +62,12 @@ export const suspects: SuspectDef[] = [
     relation: '갤러리 대표',
     motive: null,
     statement: '디너 후엔 계속 거실에 있었어요. 서재엔 안 들어갔어요.',
-    sprites: {},
+    sprites: {
+      normal: 'suspects/sera_normal.svg',
+      sweat: 'suspects/sera_sweat.svg',
+      angry: 'suspects/sera_angry.svg',
+      final: 'suspects/sera_final.svg',
+    },
   },
 ];
 

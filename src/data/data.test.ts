@@ -1,11 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { assetUrl } from '../assetUrl';
 import { deductionList, deductions } from './deductions';
 import { dialogues } from './dialogues';
 import { categories, culprit, rebuttals } from './endings';
 import { items, itemList } from './items';
 import { drawerLock, phoneLock } from './locks';
 import { rooms } from './rooms';
-import { suspects } from './scenario';
+import { scenario, suspects } from './scenario';
 
 const evidenceIds = new Set(itemList.filter((i) => i.evidence).map((i) => i.id));
 const usable = (id: string) => evidenceIds.has(id) || id in deductions;
@@ -53,5 +54,17 @@ describe('시나리오 데이터 무결성', () => {
       expect(dialogues[s.id], s.id).toBeDefined();
       if (s.id !== culprit) expect(rebuttals[s.id], s.id).toBeDefined();
     }
+  });
+
+  it('데이터에 적힌 에셋 경로는 src/assets에서 찾을 수 있다', () => {
+    const paths = [
+      ...Object.values(rooms).map((r) => r.background),
+      ...itemList.map((i) => i.image),
+      ...suspects.flatMap((s) => Object.values(s.sprites)),
+      scenario.victim.image,
+    ].filter((p): p is string => !!p);
+    expect(paths.length).toBeGreaterThan(30);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    for (const p of paths) expect(assetUrl(p), p).toBeTruthy();
   });
 });
