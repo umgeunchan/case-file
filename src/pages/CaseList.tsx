@@ -34,13 +34,15 @@ export default function CaseList() {
       </section>
       {cases.length === 0 && <p className="muted center">아직 등록된 사건이 없습니다.</p>}
       <div className="case-grid">
-        {cases.map(({ data, errors }) =>
+        {cases.map(({ key, title, data, errors }) =>
           errors.length ? (
-            <div key={data.id ?? data.title} className="case-card is-broken">
-              <CardBody data={data} status="데이터 오류" />
+            <div key={key} className="case-card is-broken">
+              <h2>{title}</h2>
+              <p className="muted">사건 파일에 오류가 있습니다. 브라우저 콘솔을 확인하세요.</p>
+              <span className="badge">데이터 오류</span>
             </div>
           ) : (
-            <Link key={data.id} to={`/case/${data.id}`} className="case-card">
+            <Link key={key} to={`/case/${data.id}`} className="case-card">
               <CardBody data={data} status={statusOf(data.id)} />
             </Link>
           ),

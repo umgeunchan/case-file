@@ -10,6 +10,8 @@ export function validateCase(raw: unknown): string[] {
 
   if (typeof raw.id !== 'string' || raw.id === '') errors.push('id가 비어 있습니다.');
   if (typeof raw.title !== 'string') errors.push('title이 없습니다.');
+  if (typeof raw.summary !== 'string') errors.push('summary는 문자열이어야 합니다.');
+  if (typeof raw.briefing !== 'string') errors.push('briefing은 문자열이어야 합니다.');
   if (typeof raw.timeLimitMinutes !== 'number' || raw.timeLimitMinutes <= 0) {
     errors.push('timeLimitMinutes는 0보다 큰 숫자여야 합니다.');
   }
@@ -21,7 +23,12 @@ export function validateCase(raw: unknown): string[] {
   if (!isRec(raw.solution)) errors.push('solution이 없습니다.');
   if (errors.some((e) => e.includes('배열') || e.includes('solution'))) return errors;
 
-  const list = (field: (typeof ARRAY_FIELDS)[number]) => raw[field] as Rec[];
+  for (const field of ARRAY_FIELDS) {
+    (raw[field] as unknown[]).forEach((x, i) => {
+      if (!isRec(x)) errors.push(`${field}[${i}]가 객체가 아닙니다.`);
+    });
+  }
+  const list = (field: (typeof ARRAY_FIELDS)[number]) => (raw[field] as unknown[]).filter(isRec);
   const idsOf = (field: (typeof ARRAY_FIELDS)[number]) => {
     const ids = new Set<string>();
     for (const x of list(field)) {

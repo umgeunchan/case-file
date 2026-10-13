@@ -1,21 +1,12 @@
-import type { CaseData } from '../types';
-import { validateCase } from '../engine/validateCase';
+import { buildRegistry, type CaseEntry } from './registry';
 
-export interface CaseEntry {
-  data: CaseData;
-  errors: string[];
-}
+export type { CaseEntry };
 
-const modules = import.meta.glob<{ default: CaseData }>('./*.json', { eager: true });
-
-export const cases: CaseEntry[] = Object.entries(modules)
-  .map(([path, mod]) => {
-    const errors = validateCase(mod.default);
-    if (errors.length) console.error(`[case-file] ${path} 데이터 오류:\n- ${errors.join('\n- ')}`);
-    return { data: mod.default, errors };
-  })
-  .sort((a, b) => String(a.data.title).localeCompare(String(b.data.title), 'ko'));
+export const cases: CaseEntry[] = buildRegistry(import.meta.glob<{ default: unknown }>('./*.json', { eager: true }));
 
 export function getCase(id: string): CaseEntry | undefined {
-  return cases.find((entry) => entry.data.id === id);
+  return (
+    cases.find((entry) => entry.errors.length === 0 && entry.data.id === id) ??
+    cases.find((entry) => entry.data?.id === id)
+  );
 }

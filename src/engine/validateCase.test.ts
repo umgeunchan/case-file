@@ -54,4 +54,20 @@ describe('validateCase', () => {
     expect(errors).toContain('timeLimitMinutes');
     expect(errors).toContain('difficulty');
   });
+  it('summary와 briefing은 문자열이어야 한다', () => {
+    const c = clone() as unknown as Record<string, unknown>;
+    c.summary = { x: 1 };
+    c.briefing = 3;
+    const errors = validateCase(c).join();
+    expect(errors).toContain('summary');
+    expect(errors).toContain('briefing');
+  });
+  it('배열 원소가 객체가 아니면 크래시 없이 오류', () => {
+    for (const field of ['locations', 'items', 'clues', 'suspects', 'dialogues']) {
+      const c = clone() as unknown as Record<string, unknown[]>;
+      c[field] = [...c[field], null];
+      expect(() => validateCase(c)).not.toThrow();
+      expect(validateCase(c).join()).toContain(field);
+    }
+  });
 });
