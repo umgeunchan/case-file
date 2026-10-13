@@ -1,9 +1,10 @@
 import { combineDuplicateText, combineFailText, deductionList } from '../data/deductions';
+import { dialogues, fallbackLine } from '../data/dialogues';
 import { items } from '../data/items';
 import { drawerLock, phoneLock } from '../data/locks';
 import { rooms } from '../data/rooms';
 import { scenario } from '../data/scenario';
-import type { RoomId } from '../data/types';
+import type { Line, RoomId, SuspectId } from '../data/types';
 
 export type Screen = 'title' | 'intro' | 'game' | 'ending';
 export type Panel = 'phone' | 'notebook' | 'interrogation' | 'accusation';
@@ -25,6 +26,9 @@ export interface GameState {
   /** 추리 노트에 기록된 추리 결과 */
   deductions: string[];
   notebookResult: (Notice & { success: boolean }) | null;
+  /** 제시 기록. "용의자:증거" 형식 */
+  presented: string[];
+  interrogation: { suspect: SuspectId; line: Line; seq: number } | null;
   drawerOpen: boolean;
   phoneUnlocked: boolean;
   /** 휴대폰 오답 메시지. shake면 화면을 흔든다 */
@@ -48,7 +52,9 @@ export type GameAction =
   | { type: 'OPEN_PANEL'; panel: Panel }
   | { type: 'CLOSE_PANEL' }
   | { type: 'SUBMIT_PIN'; pin: string }
-  | { type: 'COMBINE'; a: string; b: string };
+  | { type: 'COMBINE'; a: string; b: string }
+  | { type: 'SELECT_SUSPECT'; suspect: SuspectId }
+  | { type: 'PRESENT'; evidence: string };
 
 export const initialState: GameState = {
   screen: 'title',
@@ -58,6 +64,8 @@ export const initialState: GameState = {
   checked: [],
   deductions: [],
   notebookResult: null,
+  presented: [],
+  interrogation: null,
   drawerOpen: false,
   phoneUnlocked: false,
   phoneError: null,
@@ -127,6 +135,28 @@ function note(s: GameState, text: string, success: boolean): GameState {
   return { ...s, seq, notebookResult: { text, success, seq } };
 }
 
+export function reactionFor(suspect: SuspectId, evidence: string, presented: string[]): Line {
+  const shown = (id: string) => presented.includes(`${suspect}:${id}`);
+  const match = dialogues[suspect].reactions.find(
+    (r) => r.evidence === evidence && (r.after ?? []).every(shown),
+  );
+  return match ? { expr: match.expr, text: match.text } : fallbackLine;
+}
+
+function speak(s: GameState, suspect: SuspectId, line: Line): GameState {
+  const seq = s.seq + 1;
+  return { ...s, seq, interrogation: { suspect, line, seq } };
+}
+
+function present(s: GameState, evidence: string): GameState {
+  if (!s.interrogation || !usableEvidence(s).includes(evidence)) return s;
+  const { suspect } = s.interrogation;
+  const line = reactionFor(suspect, evidence, s.presented);
+  const key = `${suspect}:${evidence}`;
+  const presented = s.presented.includes(key) ? s.presented : [...s.presented, key];
+  return speak({ ...s, presented }, suspect, line);
+}
+
 export function gameReducer(s: GameState, a: GameAction): GameState {
   switch (a.type) {
     case 'NEW_GAME':
@@ -154,5 +184,9 @@ export function gameReducer(s: GameState, a: GameAction): GameState {
       return submitPin(s, a.pin);
     case 'COMBINE':
       return combine(s, a.a, a.b);
+    case 'SELECT_SUSPECT':
+      return speak(s, a.suspect, dialogues[a.suspect].base);
+    case 'PRESENT':
+      return present(s, a.evidence);
   }
 }

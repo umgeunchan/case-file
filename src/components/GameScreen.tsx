@@ -1,6 +1,7 @@
 import { roomOrder, rooms } from '../data/rooms';
 import { useGame } from '../state/GameContext';
 import DialogBox from './DialogBox';
+import Interrogation from './Interrogation';
 import Inventory from './Inventory';
 import ItemPopup from './ItemPopup';
 import Notebook from './Notebook';
@@ -39,11 +40,13 @@ export default function GameScreen({ debug }: { debug: boolean }) {
           <button className="pbtn" onClick={() => dispatch({ type: 'OPEN_PANEL', panel: 'notebook' })}>
             추리 노트{state.deductions.length > 0 && ` (${state.deductions.length})`}
           </button>
+          <button className="pbtn" onClick={() => dispatch({ type: 'OPEN_PANEL', panel: 'interrogation' })}>심문</button>
         </div>
       </div>
 
       {state.panel === 'phone' && <PhoneLock />}
       {state.panel === 'notebook' && <Notebook />}
+      {state.panel === 'interrogation' && <Interrogation />}
       <ItemPopup />
     </div>
   );

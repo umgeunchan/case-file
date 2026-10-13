@@ -141,3 +141,43 @@ describe('추리 노트', () => {
     expect(run([combine('smartwatch', 'smartwatch')], withAll).notebookResult?.success).toBe(false);
   });
 });
+
+describe('심문', () => {
+  const allEvidence = itemList.filter((i) => i.evidence).map((i) => i.id);
+  const withAll: GameState = { ...inGame, items: allEvidence };
+  const pick = (suspect: 'haeun' | 'minseok' | 'doyun' | 'sera'): GameAction => ({ type: 'SELECT_SUSPECT', suspect });
+  const present = (evidence: string): GameAction => ({ type: 'PRESENT', evidence });
+
+  it('용의자를 고르면 기본 진술이 나온다', () => {
+    const s = run([pick('doyun')], withAll);
+    expect(s.interrogation).toMatchObject({ suspect: 'doyun', line: { expr: 'normal', text: '11시부터 주방에서 야식을 만들었소.' } });
+  });
+  it('정의된 증거를 제시하면 반응 대사와 표정이 나온다', () => {
+    const s = run([pick('haeun'), present('will_draft')], withAll);
+    expect(s.interrogation?.line).toEqual({ expr: 'angry', text: '그래서 싸운 거예요! 하지만 죽이진 않았어요!' });
+  });
+  it('정의되지 않은 증거를 제시하면 기본 반응', () => {
+    const s = run([pick('minseok'), present('earring')], withAll);
+    expect(s.interrogation?.line).toEqual({ expr: 'normal', text: '그게 저랑 무슨 상관이죠?' });
+  });
+  it('윤세라에게 단체 사진은 귀걸이를 먼저 보여 줘야 반응한다', () => {
+    const before = run([pick('sera'), present('group_photo')], withAll);
+    expect(before.interrogation?.line.text).toBe('그게 저랑 무슨 상관이죠?');
+    const after = run([pick('sera'), present('earring'), present('group_photo')], withAll);
+    expect(after.interrogation?.line).toEqual({ expr: 'sweat', text: '……디너는 거실에서 했었죠. 그건…' });
+  });
+  it('귀걸이 제시 기록은 용의자별이다', () => {
+    const s = run([pick('haeun'), present('earring'), pick('sera'), present('group_photo')], withAll);
+    expect(s.interrogation?.line.text).toBe('그게 저랑 무슨 상관이죠?');
+  });
+  it('추리 결과도 제시할 수 있다', () => {
+    const s = run([pick('sera'), present('d_lie')], { ...withAll, deductions: ['d_lie'] });
+    expect(s.interrogation?.line.expr).toBe('angry');
+  });
+  it('갖고 있지 않은 증거나 용의자 선택 전 제시는 무시한다', () => {
+    expect(run([pick('sera'), present('d_lie')], withAll).interrogation?.line.text).toBe(
+      '디너 후엔 계속 거실에서 와인을 마셨어요. 서재엔 들어가지 않았어요.',
+    );
+    expect(run([present('earring')], withAll).interrogation).toBeNull();
+  });
+});
