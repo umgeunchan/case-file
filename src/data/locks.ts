@@ -14,10 +14,17 @@ export const phoneLock = {
   /** 특정 오답에 대한 전용 힌트 */
   hints: [{ input: '980315', text: '비밀번호가 틀렸습니다. …같은 해, 다른 날일지도?' }],
   unlockText: '잠금이 해제되었다.',
+  /** 화면 아래 대화창 문구 */
+  lines: {
+    locked: '잠금 화면에 문구가 떠 있다. 피해자에게 특별한 날짜가 있었던 걸까?',
+    unlocked: '잠금이 풀렸다. 메시지와 메모를 확인하자.',
+    messages: '피해자가 마지막으로 보낸 메시지들이다.',
+    memo: '피해자가 남긴 메모다.',
+  },
   messages: [
     { evidence: 'msg_sera', time: '22:41', to: '윤세라', text: '11시에 서재로 와. 할 얘기 있어.' },
     { evidence: 'msg_minseok', time: '22:56', to: '강민석', text: '타이레놀 말고 게보린으로' },
   ],
-  memos: [{ evidence: 'memo_forgery', text: '「푸른 정원」 위작 확정. 내일 오전 변호사·경찰 연락할 것.' }],
+  memos: [{ evidence: 'memo_forgery', title: '「푸른 정원」 위작 확정', body: '내일 오전 변호사·경찰 연락할 것.' }],
   rewards: ['msg_sera', 'msg_minseok', 'memo_forgery'],
 };
