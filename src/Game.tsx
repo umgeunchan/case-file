@@ -25,6 +25,7 @@ export default function Game() {
     <GameProvider>
       <div className="frame">
         <Screens />
+        {debug && <span className="debug-badge">DEBUG</span>}
       </div>
     </GameProvider>
   );

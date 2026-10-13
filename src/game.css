@@ -248,3 +248,5 @@ button { font: inherit; color: inherit; }
 .timeline { list-style: none; margin: 0; padding: 0; width: 100%; display: flex; flex-direction: column; gap: 6px; }
 .timeline li { display: grid; grid-template-columns: 52px 1fr; gap: 8px; padding: 8px 10px; border-left: 3px solid var(--line); background: var(--panel); font-size: 0.88rem; line-height: 1.45; }
 .timeline-time { font-family: monospace; color: var(--gold); }
+
+.debug-badge { position: absolute; top: 4px; right: 4px; z-index: 50; padding: 1px 6px; border-radius: 4px; background: #ff3b6b; color: #fff; font: 700 0.65rem monospace; pointer-events: none; }

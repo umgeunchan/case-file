@@ -61,7 +61,8 @@ export type GameAction =
   | { type: 'PRESENT'; evidence: string }
   | { type: 'ACCUSE'; suspect: SuspectId; evidence: string[] }
   | { type: 'RETRY_ACCUSATION' }
-  | { type: 'TO_TITLE' };
+  | { type: 'TO_TITLE' }
+  | { type: 'LOAD'; state: GameState };
 
 export const initialState: GameState = {
   screen: 'title',
@@ -215,6 +216,8 @@ export function gameReducer(s: GameState, a: GameAction): GameState {
       return accuse(s, a.suspect, a.evidence);
     case 'RETRY_ACCUSATION':
       return { ...s, screen: 'game', panel: 'accusation', ending: null };
+    case 'LOAD':
+      return a.state;
     case 'TO_TITLE':
       return { ...s, screen: 'title', panel: null, overlay: null };
   }
