@@ -39,7 +39,7 @@ export const rooms: Record<RoomId, RoomDef> = {
       { id: 'postit', label: '포스트잇', ...at(231, 264, 24, 36), action: item('postit') },
       { id: 'police_memo', label: '경찰 감식 메모', ...at(256, 261, 42, 36), action: item('police_memo') },
       { id: 'drawer', label: '잠긴 서랍', ...at(261, 309, 69, 42), action: { type: 'drawer' } },
-      { id: 'earring', label: '귀걸이', ...at(186, 390, 36, 36), action: item('earring') },
+      { id: 'earring', label: '책상 아래', ...at(186, 390, 36, 36), action: item('earring') },
       { id: 'receipt', label: '편의점 봉투', ...at(339, 339, 45, 75), action: item('receipt') },
       { id: 'smartwatch', label: '스마트워치', ...at(39, 417, 42, 36), action: item('smartwatch') },
       { id: 'doorlock_log', label: '도어락', ...at(312, 153, 33, 42), action: item('doorlock_log') },

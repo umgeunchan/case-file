@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 150" shape-rendering="crispEdges">
+<defs>
+<pattern id="pb-linen" width="4" height="4" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="1" height="1" fill="#e6d8b2"></rect><rect x="2" y="2" width="1" height="1" fill="#c8b68c"></rect><rect x="3" y="0" width="1" height="1" fill="#cfbe96"></rect></pattern>
+<pattern id="pb-sh" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="1" height="1" fill="#b8a678"></rect><rect x="1" y="1" width="1" height="1" fill="#b8a678"></rect></pattern>
+<pattern id="pb-grain" width="6" height="3" patternUnits="userSpaceOnUse"><rect x="0" y="1" width="4" height="1" fill="#86582e"></rect></pattern>
+<pattern id="pb-grainv" width="3" height="6" patternUnits="userSpaceOnUse"><rect x="1" y="0" width="1" height="4" fill="#86582e"></rect></pattern>
+</defs>
+<path fill="#050506" d="M0 0h120v150h-120z"></path>
+<path fill="#d8c8a0" d="M1 1h118v148h-118z"></path>
+<path fill="url(#pb-linen)" d="M1 1h118v148h-118z"></path>
+<path fill="#9a6a3c" d="M1 1h118v10h-118z M1 139h118v10h-118z M1 11h10v128h-10z M109 11h10v128h-10z M11 108h98v8h-98z"></path>
+<path fill="url(#pb-grain)" d="M1 1h118v10h-118z M1 139h118v10h-118z M11 108h98v8h-98z"></path>
+<path fill="url(#pb-grainv)" d="M1 11h10v128h-10z M109 11h10v128h-10z"></path>
+<path fill="#c08a50" d="M1 1h118v1h-118z M1 1h1v148h-1z M11 108h98v1h-98z M109 11h1v128h-1z M1 139h118v1h-118z"></path>
+<path fill="#6a4424" d="M11 11h98v1h-98z M11 11h1v97h-1z M11 116h98v1h-98z M11 116h1v23h-1z M118 1h1v148h-1z M1 148h118v1h-118z M10 11h1v128h-1z"></path>
+<path fill="url(#pb-sh)" d="M12 12h97v3h-97z M12 15h3v93h-3z M12 117h97v2h-97z M12 119h2v20h-2z"></path>
+<path fill="#b07a40" d="M12 12h4v1h-4z M12 13h3v1h-3z M104 12h4v1h-4z M105 13h3v1h-3z M12 137h4v1h-4z M104 137h4v1h-4z"></path>
+<path fill="#8a8a90" d="M20 6h4v1h-4z M40 6h4v1h-4z M60 6h4v1h-4z M80 6h4v1h-4z M98 6h4v1h-4z M20 143h4v1h-4z M40 143h4v1h-4z M60 143h4v1h-4z M80 143h4v1h-4z M98 143h4v1h-4z M5 24h1v4h-1z M5 50h1v4h-1z M5 76h1v4h-1z M5 102h1v4h-1z M5 126h1v4h-1z M114 24h1v4h-1z M114 50h1v4h-1z M114 76h1v4h-1z M114 102h1v4h-1z M114 126h1v4h-1z"></path>
+<path fill="#c8c8d0" d="M20 6h1v1h-1z M40 6h1v1h-1z M60 6h1v1h-1z M80 6h1v1h-1z M98 6h1v1h-1z"></path>
+<path fill="#a89a74" d="M78 92h6v1h-6z M80 93h3v1h-3z"></path>
+</svg>

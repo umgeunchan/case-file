@@ -56,12 +56,20 @@ describe('시나리오 데이터 무결성', () => {
     }
   });
 
+  it('확대 화면 아이템에는 확대 화면 내용이 있다', () => {
+    for (const i of itemList) {
+      expect(i.view === 'zoom', i.id).toBe(!!i.zoom);
+      if (i.zoom?.kind === 'log') for (const row of i.zoom.rows) expect(row, i.id).toHaveLength(i.zoom.columns.length);
+    }
+  });
+
   it('데이터에 적힌 에셋 경로는 src/assets에서 찾을 수 있다', () => {
     const paths = [
       ...Object.values(rooms).map((r) => r.background),
       ...itemList.map((i) => i.image),
       ...suspects.flatMap((s) => Object.values(s.sprites)),
       scenario.victim.image,
+      ...itemList.map((i) => (i.zoom?.kind === 'painting' ? i.zoom.image : undefined)),
     ].filter((p): p is string => !!p);
     expect(paths.length).toBeGreaterThan(30);
     vi.spyOn(console, 'warn').mockImplementation(() => {});

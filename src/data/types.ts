@@ -5,9 +5,21 @@ export type Expression = 'normal' | 'sweat' | 'angry' | 'final';
 /** 아이템을 터치했을 때 보여주는 방식 */
 export type ItemView =
   | 'popup' // 이미지 + 이름 + 설명
-  | 'zoom' // 텍스트가 많은 단서 확대 화면
-  | 'flip' // 뒤집으면 뒷면 텍스트가 나오는 연출
+  | 'zoom' // 기기 로그, 달력, 그림 뒷면 같은 확대 화면 (zoom 정의 필요)
   | 'dialog'; // 대화창에 설명만 출력 (분위기용)
+
+/** 확대 화면 내용. 화면 아래 대화창에는 title과 line이 나온다 */
+export type ZoomDef = { title: string; line: string } & (
+  | {
+      kind: 'log';
+      device: 'doorlock' | 'wallpad' | 'oven';
+      heading: string;
+      columns: string[];
+      rows: string[][];
+    }
+  | { kind: 'calendar'; month: number; firstWeekday: number; days: number; mark: number; markLabel: string }
+  | { kind: 'painting'; image: string; frontText: string; handwriting: string[] }
+);
 
 export interface ItemDef {
   id: string;
@@ -20,8 +32,7 @@ export interface ItemDef {
   /** 열쇠처럼 인벤토리에 보이지만 증거로는 쓰지 않는 아이템 */
   key?: boolean;
   view: ItemView;
-  /** flip 연출에서 앞면에 보여줄 텍스트 */
-  frontText?: string;
+  zoom?: ZoomDef;
   /** src/assets 기준 경로. 없으면 플레이스홀더 */
   image?: string;
 }

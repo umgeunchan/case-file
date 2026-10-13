@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react';
 import { items } from '../data/items';
 import { roomOrder, rooms } from '../data/rooms';
 import { useGame } from '../state/GameContext';
@@ -10,11 +9,7 @@ import ItemPopup from './ItemPopup';
 import Notebook from './Notebook';
 import PhoneLock from './PhoneLock';
 import RoomView from './RoomView';
-
-/** 방 테마를 CSS 변수(--t-<키>)로 바꾼다 */
-function themeVars(theme: Record<string, string>): CSSProperties {
-  return Object.fromEntries(Object.entries(theme).map(([k, v]) => [`--t-${k}`, v])) as CSSProperties;
-}
+import { themeVars } from './themeVars';
 
 export default function GameScreen({ debug }: { debug: boolean }) {
   const { state, dispatch } = useGame();
@@ -22,7 +17,7 @@ export default function GameScreen({ debug }: { debug: boolean }) {
   const evidenceCount = state.items.filter((id) => items[id]?.evidence).length;
 
   return (
-    <div className="game-screen" style={themeVars({ ...room.theme })}>
+    <div className="game-screen" style={themeVars(room.theme)}>
       <nav className="room-tabs" aria-label="방 이동">
         {roomOrder.map((id, i) => (
           <button
