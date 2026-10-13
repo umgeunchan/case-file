@@ -8,11 +8,11 @@ const EXPRESSION_LABEL: Record<Expression, string> = {
   final: '결말',
 };
 
-/** 스프라이트가 없으면 이름과 표정 키를 적은 박스로 대신한다 */
+/** 도트 초상. 스프라이트가 없으면 이름과 표정 키를 적은 박스로 대신한다 */
 export default function Portrait({ suspect, expr, size = 'large' }: { suspect: SuspectDef; expr: Expression; size?: 'large' | 'small' }) {
   const src = assetUrl(suspect.sprites[expr] ?? suspect.sprites.normal);
   return (
-    <div className={`portrait portrait-${size} expr-${expr}`}>
+    <div className={`portrait portrait-${size} expr-${expr}`} style={{ background: suspect.card.bg }}>
       {src ? (
         <img src={src} alt={`${suspect.name} (${EXPRESSION_LABEL[expr]})`} />
       ) : (
@@ -21,6 +21,7 @@ export default function Portrait({ suspect, expr, size = 'large' }: { suspect: S
           {size === 'large' && <span className="portrait-expr">{expr} · {EXPRESSION_LABEL[expr]}</span>}
         </>
       )}
+      {size === 'large' && <span className="portrait-plate" style={{ background: suspect.card.plate }}>{suspect.name}</span>}
     </div>
   );
 }
